@@ -1,3 +1,11 @@
+// Todo
+// Приложение покупки
+// Сделать UX
+// Добавить категории магазинов
+// Добавить фильтр по категориям
+// Добавить кнопку удаления всех товаров
+
+
 <script setup>
 // Импортируем нужные функции из Vue
 import { ref, onMounted, computed, watch } from 'vue'
@@ -24,11 +32,17 @@ const addTodo = () => {
     content: input_content.value,
     category: input_category.value,
     done: false,
+    editable: false,
     createdAt: new Date().getTime()
   })
   // Обнуляем поле для ввода задачи 
   input_content.value = ''
   input_category.value = null
+}
+
+// Удаление задачи
+const removeTodo = (todo) => {
+	todos.value = todos.value.filter((t) => t !== todo)
 }
 
 // Запись задач в localStorage
@@ -94,6 +108,7 @@ onMounted(() => {
         </h1>
         <div v-for="todo in todos_asc">
           <input type="text" v-model="todo.content">
+          <button @click="removeTodo(todo)">Удалить</button>
         </div>
       </div>
     </section>
@@ -102,6 +117,8 @@ onMounted(() => {
     <div class="flex justify-between">
       <a target=_blank class="text-gray-400 hover:text-white transition-all"
         href="https://www.youtube.com/watch?v=qhjxAP1hFuI">Video</a>
+      <a target=_blank class="text-gray-400 hover:text-white transition-all"
+        href="https://github.com/TylerPottsDev/yt-vue-todo-2022/blob/master/src/App.vue">Project GIT</a>
       <a target=_blank class="text-gray-400 hover:text-white transition-all" href="https://github.com/el1xz">el1xz ©</a>
     </div>
   </footer>
