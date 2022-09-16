@@ -1,134 +1,125 @@
-<!-- 
-// Todo
-// Приложение покупки
-// Сделать UX
-// Добавить категории магазинов
-// Добавить фильтр по категориям
-// Добавить кнопку удаления всех товаров 
-// Добавить progressbar для задач 
--->
-
-
-<script setup>
-// Импортируем нужные функции из Vue
-import { ref, onMounted, computed, watch } from 'vue'
-
-const todos = ref([])
-const name = ref('')
-
-const input_content = ref('')
-const input_category = ref(null)
-
-// Метод sort() на месте сортирует элементы массива и возвращает отсортированный массив.
-const todos_asc = computed(() => todos.value.sort((a, b) => {
-  return b.createdAt - a.createdAt
-}))
-
-const addTodo = () => {
-  // Проверка на пустые поля (пустое занчение value)
-  // Если правило соблюдается (пустое значение) ничего не возвращает, тем самым не добавляет задачу
-  if (input_content.value.trim() === '' || input_category.value === null) {
-    return
-  }
-  // Добавляем значение из поля ввода
-  todos.value.push({
-    content: input_content.value,
-    category: input_category.value,
-    done: false,
-    editable: false,
-    createdAt: new Date().getTime()
-  })
-  // Обнуляем поле для ввода задачи 
-  input_content.value = ''
-  input_category.value = null
-}
-
-// Удаление задачи
-const removeTodo = (todo) => {
-	todos.value = todos.value.filter((t) => t !== todo)
-}
-
-// Запись задач в localStorage
-// Метод JSON.stringify() преобразует значение JavaScript в строку JSON, возможно с заменой значений, если указана функция замены, или с включением только определённых свойств, если указан массив замены.
-watch(todos, newVal => {
-  localStorage.setItem('todos', JSON.stringify(newVal))
-},
-  { deep: true }
-)
-
-// Отслеживаем значение name с помощью функции watch и передаем данные в localStorage
-watch(name, (newVal) => {
-  localStorage.setItem('name', newVal)
-})
-
-// Получаем данные из localStorage с помощью хука onMounted
-onMounted(() => {
-  name.value = localStorage.getItem('name') || ''
-  // Метод JSON.parse() разбирает строку JSON, возможно с преобразованием получаемого в процессе разбора значения.
-  todos.value = JSON.parse(localStorage.getItem('todos')) || '[]'
-})
-</script>
-
 <template>
-  <main>
-    <section>
-      <h1>
-        Привет, <input type="text" placeholder="ваше имя" v-model="name">
-      </h1>
-    </section>
-
-    <section>
-      <h1>
-        Создать задачу
-      </h1>
-
-      <form @submit.prevent="addtodo">
-        <h1>
-          Что в вашем списке задач?
-        </h1>
-        <input type="text" placeholder="создать" v-model="input_content">
-
-        <h1>
-          Выбрать категорию
-        </h1>
-
-        <div>
-          <input type="radio" name="category" value="бизнес" v-model="input_category">
-          <div>бизнес</div>
-        </div>
-        <div>
-          <input type="radio" name="category" value="персональная" v-model="input_category">
-          <div>персональная</div>
-        </div>
-
-        <button @click="addTodo">
-          Добавить
-        </button>
-      </form>
-      <div>
-        <h1>
-          Список задач:
-        </h1>
-        <div v-for="todo in todos_asc">
-          <input type="text" v-model="todo.content">
-          <button @click="removeTodo(todo)">Удалить</button>
-        </div>
-      </div>
-    </section>
-  </main>
-  <footer class="bg-gray-800 text-white footer py-4 px-4">
-    <div class="flex justify-between">
-      <a target=_blank class="text-gray-400 hover:text-white transition-all"
-        href="https://www.youtube.com/watch?v=qhjxAP1hFuI">Video</a>
-      <a target=_blank class="text-gray-400 hover:text-white transition-all"
-        href="https://github.com/TylerPottsDev/yt-vue-todo-2022/blob/master/src/App.vue">Project GIT</a>
-      <a target=_blank class="text-gray-400 hover:text-white transition-all" href="https://github.com/el1xz">el1xz ©</a>
+  <div id="app" class="w-3/5 mx-auto p-4 bg-gray-800 rounded-md m-4 relative overflow-y-hidden pt-14 mt-20">
+    <div class="w-full absolute bg-purple-600 top-0 right-0 left-0 text-center text-white font-semibold text-xl py-2">
+      <h1>Manpage of Todo</h1>
     </div>
-  </footer>
+    <form @submit.prevent="addNewTodo()" class="border-b-2 border-purple-600 py-4">
+      <div class="flex items-center">
+        <label class="text-white text-lg font-semibold">Todo Name: </label>
+        <input v-model="newTodo" type="text" class="flex-1 px-2 py-1 bg-gray-300 rounded-sm text-gray-800">
+      </div>
+      <div class="mt-5 flex items-center justify-between">
+        <button
+          class="px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-sm focus:outline-none hover:bg-purple-500 focus:ring-4 ring-purple-600 ring-opacity-25 transition duration-100 ease-in-out transform hover:scale-105"
+        >
+          Add Todo
+        </button>
+        <button
+          class="p-3 rounded-full focus:outline-none hover:bg-purple-600 hover:bg-opacity-25"
+          @click="markAllCompleted()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current text-purple-600" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <div id="todos" class="space-y-4 my-4">
+      <div
+        id="todo"
+        v-for="todo in todos"
+        :key="todo.id"
+        @click="todoCompleted(todo)"
+        class="py-4 px-2 rounded-lg bg-gray-300 cursor-pointer transform hover:scale-105 transition duration-100 ease-in-out flex items-center justify-between"
+        :class="{'bg-purple-600 text-white line-through': todo.isCompleted}"
+      >
+        <h1>{{todo.text}}</h1>
+        <span
+          class="p-2 rounded-full cursor-pointer hover:bg-purple-700 hover:bg-opacity-20"
+          :class="{'hover:bg-white text-white hover:bg-opacity-25': !todo.isCompleted}"
+          @click="deleteTodo(todo)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
 </template>
 
+<script>
+import {ref, onMounted } from 'vue'
+
+export default {
+  name: 'App',
+  setup() {
+    const newTodo = ref('')
+    const todos = ref([])
+
+    onMounted(()=> {
+      if (localStorage.getItem('manTodos')) {
+        let manTodos = JSON.parse(localStorage.getItem('manTodos'))
+        manTodos.forEach(todo => {
+          todos.value.push(todo)
+        });
+      }
+    })
+    function addNewTodo() {
+      // console.log(newTodo.value);
+      if (newTodo.value.trim()) {
+        todos.value.push(
+          {
+            id: Date.now(),
+            text: newTodo.value,
+            isCompleted: false
+          }
+        )
+        newTodo.value = ""
+        localStorage.setItem('manTodos', JSON.stringify(todos.value))
+      }
+    }
+
+    function todoCompleted(todo) {
+      todo.isCompleted = !todo.isCompleted
+      localStorage.setItem('manTodos', JSON.stringify(todos.value))
+    }
+
+    function deleteTodo(todo) {
+      todos.value = todos.value.filter( (item) => {
+        return item != todo
+      })
+      localStorage.setItem('manTodos', JSON.stringify(todos.value))
+    }
+
+    function markAllCompleted() {
+      todos.value.forEach( (todo) => {
+        todo.isCompleted = true
+      })
+      localStorage.setItem('manTodos', JSON.stringify(todos.value))
+    }
+
+    return {
+      newTodo,
+      todos,
+      addNewTodo,
+      todoCompleted,
+      deleteTodo,
+      markAllCompleted
+    }
+
+  }
+}
+</script>
+
 <style>
-.content {
-  width: fit-content;
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+* {
+  font-family: 'Anonymous Pro';
 }
 </style>
