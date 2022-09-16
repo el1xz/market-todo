@@ -1,5 +1,7 @@
 {
-  "name": "toodov3",
+  "name": "market-todo",
+  "author": "el1xz",
+  "author-email": "t.me/elixzez",
   "private": true,
   "version": "0.0.0",
   "type": "module",
