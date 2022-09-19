@@ -63,8 +63,8 @@ export default {
   }),
   // Автообновление данных времени и даты
   created() {
-    this.intervalId = setInterval(() => this.time = Date.now(), 1000);
-    this.intervalId = setInterval(() => this.date = Date.now(), 1000);
+    this.intervalId = setInterval(() => this.time = Date.now());
+    this.intervalId = setInterval(() => this.date = Date.now());
   },
   // Получаем данные о дате и времени и обязятально делаем метод toLocaleDateString() (возвращает строку с языкозависимым представлением части с датой в этой дате.)
   computed: {
